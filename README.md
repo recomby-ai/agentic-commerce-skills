@@ -5,6 +5,8 @@ Make your website work with AI agents — discoverable, understandable, transact
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
+English | [中文](README_CN.md)
+
 ---
 
 ## Why this matters
