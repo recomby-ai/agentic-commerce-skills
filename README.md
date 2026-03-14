@@ -1,4 +1,4 @@
-# agent-ready
+# agent-commerce
 
 Make your website work with AI agents — discoverable, understandable, transactable.
 
@@ -13,18 +13,18 @@ English | [中文](README_CN.md)
 
 AI agents are starting to browse, shop, and pay — on behalf of users. ChatGPT Shopping, Google AI Mode, Perplexity, and countless autonomous agents are already visiting websites, reading product data, and initiating purchases.
 
-If your website isn't agent-ready, you're invisible to this entire channel.
+If your website isn't agent-commerce, you're invisible to this entire channel.
 
 The problem: there are 20+ competing protocols (Google vs OpenAI vs independent), no single standard, and most merchants have no idea where to start.
 
-**agent-ready** gives you everything in one place — a protocol index to understand the landscape, executable skills to actually implement support, and a growing library of real-world cases so you (and your agents) don't repeat mistakes.
+**agent-commerce** gives you everything in one place — a protocol index to understand the landscape, executable skills to actually implement support, and a growing library of real-world cases so you (and your agents) don't repeat mistakes.
 
 ## What is this
 
 **Protocols + Skills + Cases** for making any website AI-agent-compatible.
 
 ```
-agent-ready/
+agent-commerce/
 ├── protocols/          ← Protocol index: 20+ protocols, what they do, who made them, links
 ├── skills/
 │   ├── ar-discover/    ← Make agents find you (llms.txt, agents.json, A2A)
@@ -106,8 +106,8 @@ Agent reads SKILL.md
 ## Quick Start
 
 ```bash
-git clone https://github.com/recomby-ai/agent-ready.git
-cd agent-ready
+git clone https://github.com/recomby-ai/agent-commerce.git
+cd agent-commerce
 pip install requests
 
 # Audit any website
@@ -122,7 +122,7 @@ claude "Use the ar-audit skill to score example.com"
 
 ## Contributing Cases
 
-The most valuable contribution is a **case** — a record of what you (or your agent) learned while making a site agent-ready.
+The most valuable contribution is a **case** — a record of what you (or your agent) learned while making a site agent-commerce.
 
 Cases go in `skills/{skill}/references/cases/` and look like this:
 
