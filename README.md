@@ -1,162 +1,141 @@
-# agentic-commerce-skills
+# Agentic Commerce Skills
 
-Make your website work with AI agents — discoverable, understandable, transactable.
+AI agent skills for onboarding merchants to [UCP (Universal Commerce Protocol)](https://github.com/Universal-Commerce-Protocol/ucp) — the open standard by Google, Shopify, and 20+ partners that lets AI agents discover and transact with businesses.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+## What This Does
 
-English | [中文](README_CN.md)
+These skills turn an AI agent into a UCP integration specialist. Give it a merchant's website URL, and it will:
 
----
-
-## Why this matters
-
-AI agents are starting to browse, shop, and pay — on behalf of users. ChatGPT Shopping, Google AI Mode, Perplexity, and countless autonomous agents are already visiting websites, reading product data, and initiating purchases.
-
-If your website isn't agentic-commerce-skills, you're invisible to this entire channel.
-
-The problem: there are 20+ competing protocols (Google vs OpenAI vs independent), no single standard, and most merchants have no idea where to start.
-
-**agentic-commerce-skills** gives you everything in one place — a protocol index to understand the landscape, executable skills to actually implement support, and a growing library of real-world cases so you (and your agents) don't repeat mistakes.
-
-## What is this
-
-**Protocols + Skills + Cases** for making any website AI-agent-compatible.
+1. **Audit** the site for UCP readiness (structured data, payment providers, APIs)
+2. **Generate** a `/.well-known/ucp` business profile
+3. **Map** product catalogs to UCP schema format
+4. **Scaffold** checkout API code from official samples
+5. **Validate** the integration against official tools
 
 ```
-agentic-commerce-skills/
-├── protocols/          ← Protocol index: 20+ protocols, what they do, who made them, links
-├── skills/
-│   ├── ar-discover/    ← Make agents find you (llms.txt, agents.json, A2A)
-│   ├── ar-structured-data/  ← Make agents understand you (Schema.org, JSON-LD)
-│   ├── ar-commerce/    ← Make agents buy from you (ACP, UCP)
-│   ├── ar-payments/    ← Make agents pay you (Stripe SPT, x402, AP2)
-│   ├── ar-identity/    ← Make agents authenticate (OAuth, OIDC)
-│   └── ar-audit/       ← Score your site's agent-readiness (0-100)
+Merchant URL → audit → profile → catalog → checkout → validate → Live on UCP
 ```
 
-## Protocol Landscape
+## Skills
 
-Two ecosystems are forming. Merchants need to support both.
-
-| Layer | Google / Open | OpenAI / Anthropic | Independent |
-|-------|--------------|-------------------|-------------|
-| **Discovery** | A2A Agent Cards, NLWeb | — | llms.txt, Schema.org, agents.json |
-| **Communication** | A2A, AG-UI, ANP | MCP | — |
-| **Commerce** | UCP (Google + Shopify) | ACP (OpenAI + Stripe) | — |
-| **Payments** | — | Stripe SPT | x402 (Coinbase), AP2 (Visa) |
-| **Identity** | — | — | OAuth Agent Ext, DID, OIDC-A |
-| **Licensing** | — | — | ai.txt, RSL |
-
-Every protocol is indexed in [`protocols/`](protocols/) with: what it does, who made it, current status, and official spec links. No spec content is copied — we link to the source.
-
-| File | Covers |
-|------|--------|
-| [discovery.md](protocols/discovery.md) | llms.txt, agents.json, A2A Agent Cards, NLWeb, Schema.org |
-| [communication.md](protocols/communication.md) | MCP, A2A, AG-UI, ANP |
-| [commerce.md](protocols/commerce.md) | ACP, UCP |
-| [payments.md](protocols/payments.md) | Stripe SPT, x402, AP2, PayPal |
-| [identity.md](protocols/identity.md) | OAuth Agent Extensions, DID, OIDC-A |
-| [licensing.md](protocols/licensing.md) | ai.txt, RSL |
-
-## How Skills Work
-
-Each skill has three parts:
-
-```
-skills/ar-discover/
-├── SKILL.md              ← Prompts: tells the agent what to do, step by step
-├── scripts/
-│   └── validate_*.py     ← Validation: verifies the output is spec-compliant
-└── references/
-    ├── philosophy.md     ← Why this matters
-    ├── *-guide.md        ← Protocol-specific how-to guides
-    └── cases/            ← Real-world implementation cases
-        └── _template.md
-```
-
-**SKILL.md** = prompts for the agent. It reads this, knows what to do.
-
-**validate script** = quality gate. Agent generates output → validate script checks it → FAIL means keep fixing → PASS means done.
-
-**references/** = the agent's knowledge base. Guides, specs, and cases it reads before acting.
-
-### The loop
-
-```
-Agent reads SKILL.md
-  → checks references/cases/ for similar situations
-  → does the work
-  → runs validate script
-  → FAIL? fix and re-validate
-  → PASS? done
-```
-
-## Skills Overview
-
-| Skill | What the agent does | Validates against |
-|-------|--------------------|--------------------|
-| [ar-discover](skills/ar-discover/) | Deploy llms.txt, agents.json, A2A agent card | llmstxt.org spec, A2A protocol |
-| [ar-structured-data](skills/ar-structured-data/) | Add/fix Schema.org JSON-LD markup | Google Search Central requirements |
-| [ar-commerce](skills/ar-commerce/) | Set up ACP/UCP checkout endpoints | OpenAI ACP spec, Google UCP spec |
-| [ar-payments](skills/ar-payments/) | Integrate agent payment flows | Stripe SPT, coinbase/x402, Visa AP2 |
-| [ar-identity](skills/ar-identity/) | Configure agent OAuth/identity endpoints | RFC 8414, OpenID Connect Discovery |
-| [ar-audit](skills/ar-audit/) | Full 6-dimension site audit (0-100 score) | All of the above |
+| Skill | What It Does | Script |
+|-------|-------------|--------|
+| **ucp-audit** | Scans a website, scores UCP readiness 0-100, identifies reusable assets and gaps | `audit_site.py` |
+| **ucp-profile** | Generates `/.well-known/ucp` business profile JSON with correct capabilities and payment handlers | `generate_profile.py` |
+| **ucp-catalog** | Maps Shopify / WooCommerce / CSV product data to UCP catalog schema (minor units, variants, media) | `map_catalog.py` |
+| **ucp-checkout** | Guides setup of checkout API based on [official UCP samples](https://github.com/Universal-Commerce-Protocol/samples) | SKILL.md |
+| **ucp-validate** | Validates profile structure + spec URL reachability, recommends official `ucp-schema` CLI for deep validation | `validate_ucp.py` |
 
 ## Quick Start
 
 ```bash
-git clone https://github.com/recomby-ai/agentic-commerce-skills.git
-cd agentic-commerce-skills
-pip install requests
+pip install requests beautifulsoup4 jsonschema
 
-# Audit any website
-python skills/ar-audit/scripts/audit_full.py --url https://yoursite.com
+# 1. Audit a site
+python skills/ucp-audit/scripts/audit_site.py https://allbirds.com
 
-# Validate discovery files
-python skills/ar-discover/scripts/validate_discovery.py --url https://yoursite.com
+# 2. Generate a profile
+python skills/ucp-profile/scripts/generate_profile.py \
+  --domain example.com --name "My Store" --payment stripe --transport rest
 
-# Or use with Claude Code as skills
-claude "Use the ar-audit skill to score example.com"
+# 3. Map product catalog
+python skills/ucp-catalog/scripts/map_catalog.py \
+  --source shopify --url https://allbirds.com --currency USD
+
+# 4. Validate integration
+python skills/ucp-validate/scripts/validate_ucp.py https://allbirds.com
 ```
 
-## Contributing Cases
+## Tested Against Real Sites
 
-The most valuable contribution is a **case** — a record of what you (or your agent) learned while making a site agentic-commerce-skills.
+| Site | Audit Score | Validate | Notes |
+|------|------------|----------|-------|
+| allbirds.com | 65/100 | PASS 11/11 | Shopify, MCP transport |
+| glossier.com | 90/100 | PASS 11/11 | Shopify, MCP transport |
+| puddingheroes.com | 5/100 | FAIL 16/42 | Non-standard format, correctly flagged |
 
-Cases go in `skills/{skill}/references/cases/` and look like this:
+## How Validation Works
 
-```markdown
-# Shopify Store — Adding llms.txt
+We don't reinvent the wheel. Validation references official tools:
 
-- **Author:** @yourname
-- **Date:** 2026-03-15
-- **Stack:** Shopify
-- **Protocols:** llms.txt, Schema.org
+| Layer | Tool | Source |
+|-------|------|--------|
+| Profile structure | Our `validate_ucp.py` | Checks required fields, namespace rules, URL reachability |
+| Full schema validation | [`ucp-schema`](https://github.com/Universal-Commerce-Protocol/ucp-schema) | Official Rust CLI: `cargo install ucp-schema` |
+| Checkout behavior | [`conformance`](https://github.com/Universal-Commerce-Protocol/conformance) | Official test suite (12 Python test files) |
+| External discovery | [UCPchecker.com](https://ucpchecker.com) | Community validator (2,800+ merchants monitored) |
 
-## Context
-What the site needed and why.
+## UCP Protocol Overview
 
-## What Worked
-Steps that succeeded, with code snippets.
+UCP lets AI agents (Gemini, ChatGPT, Claude, etc.) discover and purchase from merchants through a standard protocol:
 
-## What Did NOT Work
-Approaches that failed and why.
-
-## Gotchas
-Non-obvious issues.
-
-## Verification
-How you confirmed it works.
-
-## Result
-PASS / PARTIAL / FAIL + one-line summary.
+```
+AI Agent                          Merchant
+   │                                 │
+   ├── GET /.well-known/ucp ────────►│  Discovery
+   │◄── capabilities + payment ──────┤
+   │                                 │
+   ├── POST /catalog/search ────────►│  Product Search
+   │◄── products[] ──────────────────┤
+   │                                 │
+   ├── POST /checkout (create) ─────►│  Checkout
+   │◄── session {id, totals} ────────┤
+   │                                 │
+   ├── POST /checkout (complete) ───►│  Payment
+   │◄── order confirmation ──────────┤
 ```
 
-These cases are **for agents to read**. When an agent runs a skill, it checks cases first. Your case helps every future agent working on a similar stack.
+**Key specs:**
+- [UCP Specification](https://github.com/Universal-Commerce-Protocol/ucp)
+- [Official Samples](https://github.com/Universal-Commerce-Protocol/samples) (Python/FastAPI + Node.js/Hono)
+- [Official Python SDK](https://github.com/Universal-Commerce-Protocol/python-sdk)
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full submission guide.
+## Project Structure
+
+```
+skills/
+├── ucp-audit/
+│   ├── SKILL.md                    # Agent instructions
+│   └── scripts/audit_site.py       # Website scanner
+├── ucp-profile/
+│   ├── SKILL.md
+│   └── scripts/generate_profile.py # Profile generator
+├── ucp-catalog/
+│   ├── SKILL.md
+│   └── scripts/map_catalog.py      # Catalog mapper (Shopify/CSV/JSON)
+├── ucp-checkout/
+│   └── SKILL.md                    # References official samples
+└── ucp-validate/
+    ├── SKILL.md
+    └── scripts/validate_ucp.py     # Validation orchestrator
+```
+
+## Using with AI Agents
+
+Each `SKILL.md` is designed to be read by an AI agent (Claude, GPT, etc.) as a step-by-step instruction manual. The agent reads the skill, runs the scripts, and produces the deliverables.
+
+**For NanoClaw / OpenClaw users:** Copy the `skills/` directory into your agent's skill path.
+
+**For Claude Code users:** Point Claude at a SKILL.md and give it a merchant URL.
+
+## Security
+
+UCP has built-in security mechanisms that merchants should implement:
+
+- **Message Signatures** (RFC 9421) — ECDSA signing of all requests/responses
+- **AP2 Mandates** — Cryptographic proof of user purchase authorization (SD-JWT)
+- **Signals** — Platform-observed environment data for fraud prevention
+- **Buyer Consent** — GDPR/CCPA consent transmission
+
+See the [UCP Security spec](https://github.com/Universal-Commerce-Protocol/ucp/blob/main/docs/specification/signatures.md) for implementation details.
+
+## Contributing
+
+1. Fork the repo
+2. Add or improve a skill
+3. Test against a real merchant site
+4. Submit a PR with test results
 
 ## License
 
-[MIT](LICENSE) — 2026 Recomby AI
+[MIT](LICENSE)

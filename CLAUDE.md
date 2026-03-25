@@ -1,44 +1,34 @@
-# agent-ready — Instructions for AI Agents
+# UCP Onboard Agent
 
-This repo contains executable skills for making merchant websites AI-agent-ready.
+## What This Is
+An agent with 5 skills that helps merchants integrate with UCP (Universal Commerce Protocol), making their products discoverable and transactable by AI agents.
 
-## Repo Structure
-
+## Skill Pipeline
 ```
-protocols/     — Protocol index: 20+ protocols across 6 categories, with official spec links
-skills/        — Executable skills (each has SKILL.md with step-by-step instructions)
-  ar-discover/         — Make agents find you (llms.txt, agents.json, A2A)
-  ar-structured-data/  — Make agents understand you (Schema.org, JSON-LD)
-  ar-commerce/         — Make agents buy from you (ACP, UCP)
-  ar-payments/         — Make agents pay you (Stripe SPT, x402, AP2)
-  ar-identity/         — Make agents authenticate (OAuth, OIDC, A2A agent card)
-  ar-audit/            — Score agent-readiness (0-100) with improvement roadmap
+ucp-audit → ucp-profile + ucp-catalog → ucp-checkout → ucp-validate
 ```
 
-## How to Use a Skill
+## Directory Structure
+```
+skills/
+├── ucp-audit/      — Scan merchant site, output readiness report
+├── ucp-profile/    — Generate /.well-known/ucp business profile
+├── ucp-catalog/    — Map product data to UCP catalog schema
+├── ucp-checkout/   — Generate checkout API code
+└── ucp-validate/   — End-to-end integration validation
+```
 
-1. Read the skill's `SKILL.md` — it has the full workflow
-2. Read `references/` files linked in SKILL.md — these are your knowledge base
-3. Check `references/cases/` — someone may have solved this for the same stack
-4. Follow the steps in SKILL.md to implement the changes
-5. Run the validate script to verify — keep fixing until exit code 0
-6. If you learned something non-obvious, write a case back to `references/cases/`
+## Conventions
+- Each skill has: SKILL.md, references/, scripts/
+- Scripts are Python 3.10+, stdlib + requests + beautifulsoup4
+- All output files go to store/clients/{client_name}/
+- JSON schemas follow UCP spec version 2026-01-23
+- Amounts are always in minor units (cents)
+- Dates are always RFC 3339
 
-## Critical Rules
-
-**Search before generating.** Before creating any file (llms.txt, JSON-LD, manifest, etc.), search the web for the latest official spec. Protocols change fast. Your training data may be outdated. The references in this repo may be outdated. The official spec is the source of truth.
-
-**Validate before declaring done.** Every skill has a validate script. Run it. If it says FAIL, you're not done. Fix the issue and re-validate. The validate scripts check against official specs — they are the quality gate.
-
-**Reference first.** Before starting work, check `references/cases/` for existing solutions. Don't reinvent what's already been solved.
-
-## Skill Inputs
-
-All skills take a **URL** as primary input via `$ARGUMENTS`. Use `${CLAUDE_SKILL_DIR}` to reference scripts and files within the skill directory.
-
-## Output Conventions
-
-- Generated files: output as code blocks with the target filename noted
-- Validation results: JSON (with `--json` flag) or human-readable text
-- Audit reports: use the scoring format from ar-audit's SKILL.md
-- Always note which protocol version/spec a recommendation targets
+## Key UCP Resources
+- Spec: https://github.com/Universal-Commerce-Protocol/ucp
+- Docs: https://ucp.dev/documentation/
+- Profile schema: source/discovery/profile_schema.json
+- Checkout schema: source/schemas/shopping/checkout.json
+- Catalog schema: source/schemas/shopping/catalog_search.json

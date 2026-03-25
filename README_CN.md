@@ -1,164 +1,81 @@
-# agentic-commerce-skills
-
-让你的网站能被 AI Agent 发现、理解、下单。
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+# Agentic Commerce Skills
 
 [English](README.md) | 中文
 
----
+帮助商家接入 [UCP（Universal Commerce Protocol）](https://github.com/Universal-Commerce-Protocol/ucp)的 AI Agent 技能集。UCP 是 Google、Shopify 等 20+ 合作伙伴共建的开放协议，让 AI agent 能发现商家并完成交易。
 
-## 为什么重要
+## 做什么
 
-AI Agent 已经开始替用户浏览、购物、支付了。ChatGPT Shopping、Google AI Mode、Perplexity，以及无数自主 Agent，正在访问网站、读取商品数据、发起购买。
+这些 skill 把 AI agent 变成 UCP 对接专家。给它一个商家网站 URL，它会：
 
-如果你的网站没有 agentic-commerce-skills，你在这个全新渠道里就是隐形的。
-
-问题是：目前有 20+ 个竞争协议（Google 阵营 vs OpenAI 阵营 vs 独立协议），没有统一标准，大多数商家完全不知道从哪开始。
-
-**agentic-commerce-skills** 把所有东西整合在一起 —— 协议索引帮你看清全局，可执行的 Skills 帮你实施改造，不断增长的实战案例库帮你（和你的 Agent）少走弯路。
-
-## 这是什么
-
-**协议索引 + 可执行 Skills + 实战案例库**，让任何网站兼容 AI Agent。
+1. **审计**网站的 UCP 就绪度（structured data、支付方式、API）
+2. **生成** `/.well-known/ucp` 商家 profile
+3. **映射**商品数据到 UCP catalog schema
+4. **搭建** checkout API（基于官方 samples）
+5. **验证**对接结果（调用官方工具）
 
 ```
-agentic-commerce-skills/
-├── protocols/          ← 协议索引：20+ 个协议，做什么、谁做的、官方链接
-├── skills/
-│   ├── ar-discover/    ← 让 Agent 能发现你（llms.txt, agents.json, A2A）
-│   ├── ar-structured-data/  ← 让 Agent 能理解你（Schema.org, JSON-LD）
-│   ├── ar-commerce/    ← 让 Agent 能下单（ACP, UCP）
-│   ├── ar-payments/    ← 让 Agent 能支付（Stripe SPT, x402, AP2）
-│   ├── ar-identity/    ← 让 Agent 能认证（OAuth, OIDC）
-│   └── ar-audit/       ← 给你的网站打分（0-100）
+商家 URL → 审计 → 生成 profile → 映射 catalog → 搭 checkout → 验证 → 上线 UCP
 ```
 
-## 协议全景
+## 技能列表
 
-两大生态正在形成，商家两边都得支持。
-
-| 层级 | Google / 开放阵营 | OpenAI / Anthropic 阵营 | 独立协议 |
-|------|------------------|------------------------|---------|
-| **发现** | A2A Agent Cards, NLWeb | — | llms.txt, Schema.org, agents.json |
-| **通信** | A2A, AG-UI, ANP | MCP | — |
-| **商务** | UCP（Google + Shopify） | ACP（OpenAI + Stripe） | — |
-| **支付** | — | Stripe SPT | x402（Coinbase）, AP2（Visa） |
-| **身份** | — | — | OAuth Agent 扩展, DID, OIDC-A |
-| **授权** | — | — | ai.txt, RSL |
-
-每个协议都索引在 [`protocols/`](protocols/) 里：做什么、谁做的、当前状态、官方 spec 链接。不复制 spec 内容，只链接官方源。
-
-| 文件 | 覆盖内容 |
-|------|---------|
-| [discovery.md](protocols/discovery.md) | llms.txt, agents.json, A2A Agent Cards, NLWeb, Schema.org |
-| [communication.md](protocols/communication.md) | MCP, A2A, AG-UI, ANP |
-| [commerce.md](protocols/commerce.md) | ACP, UCP |
-| [payments.md](protocols/payments.md) | Stripe SPT, x402, AP2, PayPal |
-| [identity.md](protocols/identity.md) | OAuth Agent 扩展, DID, OIDC-A |
-| [licensing.md](protocols/licensing.md) | ai.txt, RSL |
-
-## Skills 怎么工作
-
-每个 Skill 由三部分组成：
-
-```
-skills/ar-discover/
-├── SKILL.md              ← 改造指南：告诉 Agent 一步步怎么做
-├── scripts/
-│   └── validate_*.py     ← 验证脚本：检查产出是否符合官方 spec
-└── references/
-    ├── philosophy.md     ← 为什么要做这件事
-    ├── *-guide.md        ← 协议具体操作指南
-    └── cases/            ← 实战案例（社区贡献）
-        └── _template.md
-```
-
-**SKILL.md** = Agent 的改造指南。读完就知道怎么做。
-
-**validate 脚本** = 质量门禁。Agent 改造完 → 跑验证脚本 → FAIL 就继续改 → PASS 才算完。验证标准严格对标官方 spec。
-
-**references/** = Agent 的知识库。改造前先读，少走弯路。
-
-### 核心循环
-
-```
-Agent 读 SKILL.md
-  → 先搜索官方最新 spec（不依赖训练数据）
-  → 查 references/cases/ 看有没有类似案例
-  → 执行改造
-  → 跑 validate 脚本
-  → FAIL？修复后重新验证
-  → PASS？完成
-  → 踩坑了？写回 case，下一个 Agent 受益
-```
-
-## Skills 一览
-
-| Skill | Agent 做什么 | 验证对标 |
-|-------|-------------|---------|
-| [ar-discover](skills/ar-discover/) | 生成 llms.txt、agents.json、A2A agent card | llmstxt.org spec, A2A 协议 |
-| [ar-structured-data](skills/ar-structured-data/) | 生成/修复 Schema.org JSON-LD | Google Search Central 官方要求 |
-| [ar-commerce](skills/ar-commerce/) | 搭建 ACP/UCP 商务端点 | OpenAI ACP spec, Google UCP spec |
-| [ar-payments](skills/ar-payments/) | 集成 Agent 支付流程 | Stripe SPT, coinbase/x402, Visa AP2 |
-| [ar-identity](skills/ar-identity/) | 配置 Agent OAuth/身份认证 | RFC 8414, OpenID Connect Discovery |
-| [ar-audit](skills/ar-audit/) | 6 维度综合评分（0-100） | 以上所有 |
+| 技能 | 功能 | 脚本 |
+|------|------|------|
+| **ucp-audit** | 扫描网站，评分 0-100，识别可复用资产和缺失项 | `audit_site.py` |
+| **ucp-profile** | 生成标准 `/.well-known/ucp` 商家 profile JSON | `generate_profile.py` |
+| **ucp-catalog** | 映射 Shopify / WooCommerce / CSV 商品数据到 UCP 格式 | `map_catalog.py` |
+| **ucp-checkout** | 基于[官方 samples](https://github.com/Universal-Commerce-Protocol/samples) 搭建 checkout API | SKILL.md |
+| **ucp-validate** | 验证 profile 结构 + URL 可达性，推荐官方 `ucp-schema` CLI 做深度验证 | `validate_ucp.py` |
 
 ## 快速开始
 
 ```bash
-git clone https://github.com/recomby-ai/agentic-commerce-skills.git
-cd agentic-commerce-skills
-pip install requests
+pip install requests beautifulsoup4 jsonschema
 
-# 给任何网站打分
-python skills/ar-audit/scripts/audit_full.py --url https://yoursite.com
+# 1. 审计
+python skills/ucp-audit/scripts/audit_site.py https://allbirds.com
 
-# 验证发现文件
-python skills/ar-discover/scripts/validate_discovery.py --url https://yoursite.com
+# 2. 生成 profile
+python skills/ucp-profile/scripts/generate_profile.py \
+  --domain example.com --name "我的店铺" --payment stripe --transport rest
 
-# 或者在 Claude Code 里当 skills 用
-claude "Use the ar-audit skill to score example.com"
+# 3. 映射商品
+python skills/ucp-catalog/scripts/map_catalog.py \
+  --source shopify --url https://allbirds.com --currency USD
+
+# 4. 验证
+python skills/ucp-validate/scripts/validate_ucp.py https://allbirds.com
 ```
 
-## 贡献案例
+## 真实网站测试结果
 
-最有价值的贡献是一个 **case**（实战案例）—— 记录你（或你的 Agent）在改造网站过程中学到的东西。
+| 网站 | 审计得分 | 验证 | 备注 |
+|------|---------|------|------|
+| allbirds.com | 65/100 | PASS 11/11 | Shopify，MCP 传输 |
+| glossier.com | 90/100 | PASS 11/11 | Shopify，MCP 传输 |
+| puddingheroes.com | 5/100 | FAIL 16/42 | 非标准格式，被正确标记 |
 
-案例放在 `skills/{skill}/references/cases/` 里，格式如下：
+## 验证方式
 
-```markdown
-# Shopify 店铺 — 添加 llms.txt
+不重复造轮子，验证引用官方工具：
 
-- **Author:** @yourname
-- **Date:** 2026-03-15
-- **Stack:** Shopify
-- **Protocols:** llms.txt, Schema.org
+| 层级 | 工具 | 来源 |
+|------|------|------|
+| Profile 结构 | 我们的 `validate_ucp.py` | 检查必填字段、命名空间、URL 可达性 |
+| 完整 Schema 验证 | [`ucp-schema`](https://github.com/Universal-Commerce-Protocol/ucp-schema) | 官方 Rust CLI |
+| Checkout 行为 | [`conformance`](https://github.com/Universal-Commerce-Protocol/conformance) | 官方测试套件（12 个测试文件） |
+| 外部发现 | [UCPchecker.com](https://ucpchecker.com) | 社区验证器（2800+ 商家） |
 
-## Context
-网站需要什么，为什么需要。
+## 安全
 
-## What Worked
-成功的步骤，附代码片段。
+UCP 内置了四层安全机制：
 
-## What Did NOT Work
-试过但失败的方案，以及为什么失败。
+- **消息签名**（RFC 9421）— ECDSA 签名所有请求/响应
+- **AP2 Mandate** — 密码学级别的购买授权证明（SD-JWT）
+- **Signals** — 平台观测的环境数据用于反欺诈
+- **Buyer Consent** — GDPR/CCPA 合规的同意传输
 
-## Gotchas
-踩坑点，不明显的问题。
+## 协议
 
-## Verification
-怎么验证成功的（跑了哪个 validate 脚本，什么结果）。
-
-## Result
-PASS / PARTIAL / FAIL + 一句话总结。
-```
-
-这些案例是**给 Agent 读的**。Agent 跑 skill 时会先查案例。你的案例 = 所有未来 Agent 的捷径。
-
-详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
-## License
-
-[MIT](LICENSE) — 2026 Recomby AI
+[MIT](LICENSE)
